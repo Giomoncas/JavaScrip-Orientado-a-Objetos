@@ -94,7 +94,7 @@ function videoStop(id)
     console.log("Pausamos la url " + urlSecreta);
 }
 
-export class PlatziClass
+class PlatziClass
 {
   constructor({
     name,
@@ -115,18 +115,17 @@ export class PlatziClass
       videoStop(this.videoID);
     }
 }
-
-
-
-
-
 class Course {  //Creamos la clase cursos
     constructor({
       name,
       classes = [],
+      isFree = false,
+      lang = "spanish",
     }) {
       this._name = name;  //Se crea un atributo privado
       this.classes = classes;
+      this.isFree = isFree;
+      this.lang = lang;
     }
 
     //Creamos nuestro primer getter
@@ -150,12 +149,14 @@ class Course {  //Creamos la clase cursos
   
   const cursoProgBasica = new Course({  //Acá creamos la instancia de la clase cursos
     name: "Curso Gratis de Programación Básica",
+    isFree: true,    
   });
   const cursoDefinitivoHTML = new Course({
     name: "Curso Definitivo de HTML y CSS",  //Esto permite que el código solo se modifique aca y no en cada instancia de objeto
   });
   const cursoPracticoHTML = new Course({
     name: "Curso Practico de HTML y CSS",
+    lang: "english",
   });
 
   const cursoDataBussinnes = new Course({
@@ -234,6 +235,93 @@ class Course {  //Creamos la clase cursos
       this.approvedCourses = approvedCourses;
       this.learningPaths = learningPaths;
     }
+
+    publicarComentario(commentContent)
+    {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+        });
+        
+        comment.publicar();
+    }
+  }
+
+  class freeStudent extends Student4  //Esta es la forma de aplicar la herencia de la clase padre Student para poder acceder a todos los atributos y metodos de esa clase desde esta clase
+  {
+      constructor(props)
+      {
+          super(props); //Palabra reservada super que nos permite llamar al constructor de nuestra clase madre
+      }
+
+      approvedCours(newCourse)
+      {
+         if(newCourse.isFree)
+         {
+            this.approvedCourses.push(newCourse);
+         }
+         else
+         {
+            console.warn("Lo sentimos," + this.name + "este curso no es gratis");
+         }
+      };
+  }  
+
+  class basicStudent extends Student4  //Palabra reservada extends para aplicar herencia
+  {
+    constructor(props)
+    {
+        super(props); //Palabra reservada super que nos permite llamar al constructor de nuestra clase madre
+    }
+
+    approvedCours(newCourse)
+      {
+         if(newCourse.lang !== "english")
+         {
+            this.approvedCourses.push(newCourse);
+         }
+         else
+         {
+            console.warn("Lo sentimos," + this.name + "no puedes tomar cursos en ingles");  //Console.warn muestra un mensaje de advertencia que se muestra en color naranja
+         }
+      };
+  }
+
+  class expertStudent extends Student4
+  {
+    constructor(props)
+    {
+        super(props); //Palabra reservada super que nos permite llamar al constructor de nuestra clase madre
+    }
+
+    approvedCours(newCourse)
+      {
+          this.approvedCourses.push(newCourse);        
+      };
+  }
+
+  class teacherStudent extends Student4
+  {
+    constructor(props)
+    {
+        super(props); //Palabra reservada super que nos permite llamar al constructor de nuestra clase madre
+    }
+
+    approvedCours(newCourse)
+    {
+          this.approvedCourses.push(newCourse);        
+    };
+
+    publicarComentario(commentContent)
+    {
+        const comment = new Comment({
+            content: commentContent,
+            studentName: this.name,
+            studentRole: "teacher",
+        });
+        
+        comment.publicar();
+    }
   }
   
   const juan2 = new Student4({
@@ -257,4 +345,55 @@ class Course {  //Creamos la clase cursos
       escuelaData,
     ],
   });
+
+  const giovanni = new freeStudent({
+    name: "Giovanni",
+    username: "Giomoncas",
+    email: "gio@gmail.com",
+    twitter: "@giomoncas",
+    learningPaths: [
+      escuelaWeb,
+      escuelaVgs,
+    ],
+  });
+  
+  const erica = new basicStudent({
+    name: "Erica",
+    username: "erior",
+    email: "eri@gmail.com",
+    instagram: "@erior",
+    learningPaths: [
+      escuelaWeb,
+      escuelaData,
+    ],
+  });
+
+  const freddy = new teacherStudent({
+    name: "Freddy",
+    username: "fredyer",
+    email: "fredy@gmail.com",
+    instagram: "@fredier",    
+  });
+
+  class Comment
+  {
+    constructor({
+        content,
+        studentName,
+        studentRole = "student",
+    })    
+    {
+      this.content = content;
+      this.studentName = studentName;
+      this.studentRole = studentRole;
+      this.likes = 0;
+    }
+
+    publicar()
+    {
+      console.log(this.studentName + " (" + this.studentRole + ")");
+      console.log(this.likes + " likes");
+      console.log(this.content);
+    }
+  }
 
